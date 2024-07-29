@@ -1,5 +1,7 @@
 ### 清理评论.js for Codemao
 
+#### [发布页](https://shequ.codemao.cn/work/231786149)
+
 #### 使用
 
 安装 Node.js 18.0.0+，因为本项目依赖的库需要 fetch API
