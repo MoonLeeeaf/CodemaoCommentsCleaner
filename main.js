@@ -2,7 +2,9 @@ const { CodemaoApi } = require('./moon-codemao-api')
 
 let v = {}
 
-const reg = /^.?自动.*$/
+// [自动评论]...  不匹配 “自动评论的初衷....”
+// 今天是xxxx日，发给xxxx，不能在你这断了，不能少于.....，如果不发就xxxx
+const reg = /(^.自动.*$|.*发给.*少于.*如果不发.*)/gs
 
 if (process.argv.length < 4)
     return console.error('Usage: node main.js <authentication> (<workid> / --user=<userId>)')
