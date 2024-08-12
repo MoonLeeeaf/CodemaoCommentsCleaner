@@ -24,7 +24,7 @@ async function clean(workId) {
         // commentId = i.id， text = i.content
         // 16030966 AI大烤鸡（）
         if (reg.test(i.content) || i.user.id == 16030966) {
-            console.log(`删除${ CodemaoApi.WorkComment.deleteComment(workId, i.id) ? '成功' : '失败' }: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
+            console.log(`在作品 ${ info.work_name }(${ workId }) 中删除${ CodemaoApi.WorkComment.deleteComment(workId, i.id) ? '成功' : '失败' }了: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
         }
     }
     console.log(`清理完毕！`)
