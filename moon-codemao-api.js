@@ -2,11 +2,15 @@
  * Aumiao-js
  * 喵呜~
  * GitHub @满月叶
- * v1.0.0
+ * v1.0.1
  */
 
 function promise(cb) {
     return new Promise(cb)
+}
+
+function sleep(t) {
+    return promise((r) => setTimeout(r, t))
 }
 
 const CodemaoApi = class {
@@ -53,13 +57,14 @@ const CodemaoApi = class {
     static async featchAll(apiUrlWithoutOffsetAndLimit) {
         function fetchSome(offset, limit) {
             return promise((r) => fetch(`${apiUrlWithoutOffsetAndLimit}offset=${offset}&limit=${limit}`, { headers: CodemaoApi.headers }).then(async (res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(await res.json())
-                r({items: []})
+                r({items: [], code: res.status, info: await res.json() })
             }))
         }
         let offset = 0
-        let limit = 200
+        // 设置太大会导致该死的 400 -> Param-Invalid@Common
+        let limit = 30
         /** @type { Array } */
         let items
 
@@ -70,6 +75,10 @@ const CodemaoApi = class {
             offset += limit
 
             items.forEach((v) => collect.push(v))
+            
+            // console.log(data)
+            
+            sleep(Math.random() * 3)
         } while (items.length != 0)
 
         return collect
@@ -100,7 +109,7 @@ const CodemaoApi = class {
                     pid: "65edCTyg", // 写死的, 不会变动
                 }, headers: CodemaoApi.headers
             }).then(async (res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r((await res.json()).auth.token)
                 r(null)
             }))
@@ -111,7 +120,7 @@ const CodemaoApi = class {
          */
         static getMyDetails() {
             return promise((r) => fetch(`${CodemaoApi.baseUrl}/web/users/details`, { headers: CodemaoApi.headers }).then(async (res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(res.json())
                 r(null)
             }))
@@ -129,7 +138,7 @@ const CodemaoApi = class {
          */
         static like(workId, unLike) {
             return promise((r) => fetch(`${CodemaoApi.baseUrl}/nemo/v2/works/${workId}/like`, { headers: CodemaoApi.headers, method: unLike ? "delete" : "post" }).then((res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(true)
                 r(false)
             }))
@@ -142,7 +151,7 @@ const CodemaoApi = class {
          */
         static collect(workId, unCollect) {
             return promise((r) => fetch(`${CodemaoApi.baseUrl}/nemo/v2/works/${workId}/collection`, { headers: CodemaoApi.headers, method: unCollect ? "delete" : "post" }).then((res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(true)
                 r(false)
             }))
@@ -155,7 +164,7 @@ const CodemaoApi = class {
          */
         static getNewestWorks(limit, offset) {
             return promise((r) => fetch(`${CodemaoApi.baseUrl}/creation-tools/v1/pc/discover/newest-work?work_origin_type=ORIGINAL_WORK&offset=${offset ? offset : 0}&limit=${limit ? limit : 20}`, { headers: CodemaoApi.headers }).then(async (res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(await res.json())
                 r(false)
             }))
@@ -177,7 +186,7 @@ const CodemaoApi = class {
          */
         static getWorkInfo(workId) {
             return promise((r) => fetch(`${CodemaoApi.baseUrl}/creation-tools/v1/works/${workId}`, { headers: CodemaoApi.headers }).then(async (res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(await res.json())
                 r(false)
             }))
@@ -203,7 +212,7 @@ const CodemaoApi = class {
          */
         static deleteComment(workId, commentId) {
             return promise((r) => fetch(`${CodemaoApi.baseUrl}/creation-tools/v1/works/${workId}/comment/${commentId}`, { headers: CodemaoApi.headers, method: "delete" }).then((res) => {
-                if (res.status >= 200 && res.status < 300)
+                if (res.ok)
                     return r(true)
                 r(false)
             }))
