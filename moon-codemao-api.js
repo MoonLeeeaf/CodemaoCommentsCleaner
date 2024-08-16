@@ -64,7 +64,7 @@ const CodemaoApi = class {
         }
         let offset = 0
         // 设置太大会导致该死的 400 -> Param-Invalid@Common
-        let limit = 30
+        let limit = 15
         /** @type { Array } */
         let items
 
