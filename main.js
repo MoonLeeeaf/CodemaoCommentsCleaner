@@ -8,11 +8,16 @@ let v = {}
 // 今天是xxxx日，发给xxxx，不能在你这断了，不能少于.....，如果不发就xxxx
 // ［手动评论］... 不匹配 “手动狗头”
 // [自动评论][不喜可删]... / [不喜可删] (在 1112808143 无法删除，原因未知)
-const reg = /(^.自动.*$|.*发给.*少于.*如果不发.*|^.手动.*$|^.?.?.?.?.?.?.?不喜可删.*$)/gs
+const reg = /(^.自动.*$|.*发给.*少于.*如果不发.*|^.手动.*$|^.?.?.?.?.?.?.?不喜可删.*$|.*\[编程猫_加油\].*)/gs
+
+// xxx这个xx的赞就... / xxx，已赞，xxxx...
+const regWithMyName = '(,|，)?.....赞.*'
+
+// 此类正则会自动加上 ^[你的昵称]
 
 const blackList = [
     16030966, // AI大烤鸡
-    1112808143 // bridge -> 低配自动化滥用
+    1112808143 // bridge -> 狗逼玩意低配自动化滥用
 ]
 
 // ============= 上配置文件 =============
@@ -27,13 +32,15 @@ CodemaoApi.setCookieToken(process.argv[2])
  * @param { Number } workId 作品ID
  */
 async function clean(workId) {
+    let myInfo = await CodemaoApi.User.getMyDetails()
+    let myNickName = myInfo.nickname
     let info = await CodemaoApi.Work.getWorkInfo(workId)
     console.log(`正在扫描作品 ${workId}`)
     let res = await CodemaoApi.WorkComment.getWorkComments(workId)
     // console.log(res)
     for (let i of res) {
         // commentId = i.id， text = i.content
-        if (reg.test(i.content) || blackList.includes(i.user.id)) {
+        if (reg.test(i.content) || blackList.includes(i.user.id) || new RegExp('^' + myNickName + regWithMyName, 'gs').test(i.content) /* 2024.8.23 本人所有作品所有评论全部死在今天，因为没加 .test() */) {
             console.log(`在作品 ${ info.work_name }(${ workId }) 中删除${ CodemaoApi.WorkComment.deleteComment(workId, i.id) ? '成功' : '失败' }了: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
         }
     }
