@@ -17,7 +17,10 @@ let v = {}
 const reg = /(^.(自|手)动.*$|.*发给.*少于.*如果不发.*|^.手动.*$|^.?.?.?.?.?.?.?不喜可删.*$|.*\[编程猫_加油\].*)/gs
 
 // xxx这个xx的赞就... / xxx，已赞，xxxx...
-const regWithMyName = '(,|，)?.....赞.*'
+const regWithMyNameEnd = '((,|，)?.....赞.*)'
+
+// 不错哦xxx
+const regWithMyNameStart = '(不错哦)'
 
 // 此类正则会自动加上 ^[你的昵称]
 
@@ -46,7 +49,7 @@ async function clean(workId) {
     // console.log(res)
     for (let i of res) {
         // commentId = i.id， text = i.content
-        if (reg.test(i.content) || blackList.includes(i.user.id) || new RegExp('^' + myNickName + regWithMyName, 'gs').test(i.content) /* 2024.8.23 本人所有作品所有评论全部死在今天，因为没加 .test() */) {
+        if (reg.test(i.content) || new RegExp(`.*${info.work_name}.*`).test(i.content) || blackList.includes(i.user.id) || new RegExp('^' + myNickName + regWithMyNameEnd, 'gs').test(i.content) /* 2024.8.23 本人所有作品所有评论全部死在今天，因为没加 .test() */ || new RegExp('^' + regWithMyNameStart + myNickName, 'gs').test(i.content) ) {
             console.log(`在作品 ${ info.work_name }(${ workId }) 中删除${ CodemaoApi.WorkComment.deleteComment(workId, i.id) ? '成功' : '失败' }了: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
         }
     }
