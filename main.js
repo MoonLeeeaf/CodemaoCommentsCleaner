@@ -14,7 +14,7 @@ let v = {}
 // 今天是xxxx日，发给xxxx，不能在你这断了，不能少于.....，如果不发就xxxx
 // ［手动评论］... 不匹配 “手动狗头”
 // [自动评论][不喜可删]... / [不喜可删] (在 1112808143 无法删除，原因未知)
-const reg = /(^...广告.*$|^.(自|手)动.*$|.*发给.*少于.*如果不发.*|^.手动.*$|^.?.?.?.?.?.?.?不喜可删.*$|.*\[编程猫_加油\].*)/gs
+const reg = /(^.广告.*$|^.(自|手)动.*$|.*发给.*少于.*如果不发.*|^.手动.*$|^.?.?.?.?.?.?.?不喜可删.*$|.*\[编程猫_加油\].*)/gs
 
 // xxx这个xx的赞就... / xxx，已赞，xxxx...
 const regWithMyNameEnd = '((,|，)?.....赞.*)'
@@ -28,6 +28,9 @@ const blackList = [
     16030966, // AI大烤鸡
     1112808143, // bridge -> 狗逼玩意低配自动化滥用
 ]
+
+// 白名单
+const whiteList = []
 
 // ============= 上配置文件 =============
 
@@ -50,6 +53,10 @@ async function clean(workId) {
     for (let i of res) {
         // commentId = i.id， text = i.content
         if (reg.test(i.content) || new RegExp(`.*${info.work_name}.*`).test(i.content) || blackList.includes(i.user.id) || new RegExp('^' + myNickName + regWithMyNameEnd, 'gs').test(i.content) /* 2024.8.23 本人所有作品所有评论全部死在今天，因为没加 .test() */ || new RegExp('^' + regWithMyNameStart + myNickName, 'gs').test(i.content) ) {
+            if (whiteList.includes(i.user.id)) {
+                console.log(`跳过作品 ${ info.work_name }(${ workId })的评论: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
+                continue
+            }
             console.log(`在作品 ${ info.work_name }(${ workId }) 中删除${ CodemaoApi.WorkComment.deleteComment(workId, i.id) ? '成功' : '失败' }了: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
         }
     }
@@ -58,6 +65,7 @@ async function clean(workId) {
 
 if (process.argv[3].startsWith('--user=')) {
     let u = process.argv[3].replaceAll('--user=', '')
+    whiteList.push(parseInt(u))
     CodemaoApi.Work.getUserWorksByNewest(u).then((res) => {
         for (let i of res) {
             // work_name， id
