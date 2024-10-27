@@ -75,8 +75,11 @@ if (process.argv[3].startsWith('--user=')) {
             console.log(`获取到作品: ${i.work_name}(${i.id})`)
             clean(i.id)
         }
-        if (cleaned == 0)
-            process.exit(1)
     })
 } else
     clean(process.argv[3])
+
+process.on('exit', (code) => {
+      if (cleaned == 0)
+            process.exit(1)
+})
