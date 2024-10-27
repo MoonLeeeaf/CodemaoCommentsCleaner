@@ -39,6 +39,8 @@ if (process.argv.length < 4)
 
 CodemaoApi.setCookieToken(process.argv[2])
 
+let cleaned = 0
+
 /**
  * 清理作品内的评论
  * @param { Number } workId 作品ID
@@ -58,6 +60,7 @@ async function clean(workId) {
                 continue
             }
             console.log(`在作品 ${ info.work_name }(${ workId }) 中删除${ CodemaoApi.WorkComment.deleteComment(workId, i.id) ? '成功' : '失败' }了: ${i.id} -> 来自 ${i.user.nickname}(${i.user.id}) -> ${i.content}`)
+            cleaned++
         }
     }
     console.log(`清理完毕！`)
@@ -72,6 +75,8 @@ if (process.argv[3].startsWith('--user=')) {
             console.log(`获取到作品: ${i.work_name}(${i.id})`)
             clean(i.id)
         }
+        if (cleaned == 0)
+            process.exit(1)
     })
 } else
     clean(process.argv[3])
