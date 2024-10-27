@@ -80,6 +80,8 @@ if (process.argv[3].startsWith('--user=')) {
     clean(process.argv[3])
 
 process.on('exit', (code) => {
-      if (cleaned == 0)
+      if (cleaned != 0) {
+            console.log(`已清理 ${cleaned} 条评论`)
             process.exit(1)
+      }
 })
