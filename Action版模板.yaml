@@ -11,7 +11,7 @@ jobs:
     env:
       TOKEN: [你的JWT令牌(可以在 cookie: authorization=xxx 找到)]
     steps:
-      - name: run
+      - name: run # 当然你可以Fork一份仓库进行修改 以自定义你的规则👍
         run: |
           sudo apt-get install nodejs git
           git clone https://github.com/MoonLeeeaf/CodemaoCommentsCleaner.git
