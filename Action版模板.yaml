@@ -1,0 +1,20 @@
+name: Codemao Comments Cleaner
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0/15 * * * *' # 每15分钟执行一次
+    
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    env:
+      TOKEN: [你的JWT令牌(可以在 cookie: authorization=xxx 找到)]
+    steps:
+      - name: run
+        run: |
+          sudo apt-get install nodejs git
+          git clone https://github.com/MoonLeeeaf/CodemaoCommentsCleaner.git
+          node CodemaoCommentsCleaner/main.js $TOKEN --user=[你的编号]
+      
+  
